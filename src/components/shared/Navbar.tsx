@@ -1,14 +1,9 @@
-import { BookOpenIcon, InfoIcon, LifeBuoyIcon } from "lucide-react"
-
-import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
     NavigationMenu,
-    NavigationMenuContent,
     NavigationMenuItem,
     NavigationMenuLink,
     NavigationMenuList,
-    NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu"
 import {
     Popover,
@@ -17,53 +12,12 @@ import {
 } from "@/components/ui/popover"
 import Link from "next/link"
 import Image from "next/image"
+import { SignedIn, SignedOut } from "@clerk/nextjs"
 
 // Navigation links array to be used in both desktop and mobile menus
 const navigationLinks = [
-    { href: "#", label: "Home" },
-    {
-        label: "Features",
-        submenu: true,
-        type: "description",
-        items: [
-            {
-                href: "#",
-                label: "Components",
-                description: "Browse all components in the library.",
-            },
-            {
-                href: "#",
-                label: "Documentation",
-                description: "Learn how to use the library.",
-            },
-            {
-                href: "#",
-                label: "Templates",
-                description: "Pre-built layouts for common use cases.",
-            },
-        ],
-    },
-    {
-        label: "Pricing",
-        submenu: true,
-        type: "simple",
-        items: [
-            { href: "#", label: "Product A" },
-            { href: "#", label: "Product B" },
-            { href: "#", label: "Product C" },
-            { href: "#", label: "Product D" },
-        ],
-    },
-    {
-        label: "About",
-        submenu: true,
-        type: "icon",
-        items: [
-            { href: "#", label: "Getting Started", icon: "BookOpenIcon" },
-            { href: "#", label: "Tutorials", icon: "LifeBuoyIcon" },
-            { href: "#", label: "About Us", icon: "InfoIcon" },
-        ],
-    },
+    { href: "/pricing", label: "Pricing" },
+    { href: "/dashboard", label: "Your Summeries" },
 ]
 
 export default function Navbar() {
@@ -112,47 +66,9 @@ export default function Navbar() {
                                 <NavigationMenuList className="flex-col items-start gap-0 md:gap-2">
                                     {navigationLinks.map((link, index) => (
                                         <NavigationMenuItem key={index} className="w-full">
-                                            {link.submenu ? (
-                                                <>
-                                                    <div className="px-2 py-1.5 text-xs font-medium text-muted-foreground">
-                                                        {link.label}
-                                                    </div>
-                                                    <ul>
-                                                        {link.items.map((item, itemIndex) => (
-                                                            <li key={itemIndex}>
-                                                                <NavigationMenuLink
-                                                                    href={item.href}
-                                                                    className="py-1.5"
-                                                                >
-                                                                    {item.label}
-                                                                </NavigationMenuLink>
-                                                            </li>
-                                                        ))}
-                                                    </ul>
-                                                </>
-                                            ) : (
-                                                <NavigationMenuLink href={link.href} className="py-1.5">
-                                                    {link.label}
-                                                </NavigationMenuLink>
-                                            )}
-                                            {/* Add separator between different types of items */}
-                                            {index < navigationLinks.length - 1 &&
-                                                // Show separator if:
-                                                // 1. One is submenu and one is simple link OR
-                                                // 2. Both are submenus but with different types
-                                                ((!link.submenu &&
-                                                    navigationLinks[index + 1].submenu) ||
-                                                    (link.submenu &&
-                                                        !navigationLinks[index + 1].submenu) ||
-                                                    (link.submenu &&
-                                                        navigationLinks[index + 1].submenu &&
-                                                        link.type !== navigationLinks[index + 1].type)) && (
-                                                    <div
-                                                        role="separator"
-                                                        aria-orientation="horizontal"
-                                                        className="-mx-1 my-1 h-px w-full bg-border"
-                                                    />
-                                                )}
+                                            <NavigationMenuLink href={link.href} className="py-1.5">
+                                                {link.label}
+                                            </NavigationMenuLink>
                                         </NavigationMenuItem>
                                     ))}
                                 </NavigationMenuList>
@@ -185,86 +101,12 @@ export default function Navbar() {
                     <NavigationMenuList className="gap-2">
                         {navigationLinks.map((link, index) => (
                             <NavigationMenuItem key={index}>
-                                {link.submenu ? (
-                                    <>
-                                        <NavigationMenuTrigger className="bg-transparent px-2 py-1.5 font-medium text-muted-foreground hover:text-primary *:[svg]:-me-0.5 *:[svg]:size-3.5">
-                                            {link.label}
-                                        </NavigationMenuTrigger>
-                                        <NavigationMenuContent className="z-50 p-1 data-[motion=from-end]:slide-in-from-right-16! data-[motion=from-start]:slide-in-from-left-16! data-[motion=to-end]:slide-out-to-right-16! data-[motion=to-start]:slide-out-to-left-16!">
-                                            <ul
-                                                className={cn(
-                                                    link.type === "description"
-                                                        ? "min-w-64"
-                                                        : "min-w-48"
-                                                )}
-                                            >
-                                                {link.items.map((item, itemIndex) => (
-                                                    <li key={itemIndex}>
-                                                        <NavigationMenuLink
-                                                            href={item.href}
-                                                            className="py-1.5"
-                                                        >
-                                                            {/* Display icon if present */}
-                                                            {link.type === "icon" && "icon" in item && (
-                                                                <div className="flex items-center gap-2">
-                                                                    {item.icon === "BookOpenIcon" && (
-                                                                        <BookOpenIcon
-                                                                            size={16}
-                                                                            className="text-foreground opacity-60"
-                                                                            aria-hidden="true"
-                                                                        />
-                                                                    )}
-                                                                    {item.icon === "LifeBuoyIcon" && (
-                                                                        <LifeBuoyIcon
-                                                                            size={16}
-                                                                            className="text-foreground opacity-60"
-                                                                            aria-hidden="true"
-                                                                        />
-                                                                    )}
-                                                                    {item.icon === "InfoIcon" && (
-                                                                        <InfoIcon
-                                                                            size={16}
-                                                                            className="text-foreground opacity-60"
-                                                                            aria-hidden="true"
-                                                                        />
-                                                                    )}
-                                                                    <span>{item.label}</span>
-                                                                </div>
-                                                            )}
-
-                                                            {/* Display label with description if present */}
-                                                            {link.type === "description" &&
-                                                                "description" in item ? (
-                                                                <div className="space-y-1">
-                                                                    <div className="font-medium">
-                                                                        {item.label}
-                                                                    </div>
-                                                                    <p className="line-clamp-2 text-xs text-muted-foreground">
-                                                                        {item.description}
-                                                                    </p>
-                                                                </div>
-                                                            ) : (
-                                                                // Display simple label if not icon or description type
-                                                                !link.type ||
-                                                                (link.type !== "icon" &&
-                                                                    link.type !== "description" && (
-                                                                        <span>{item.label}</span>
-                                                                    ))
-                                                            )}
-                                                        </NavigationMenuLink>
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                        </NavigationMenuContent>
-                                    </>
-                                ) : (
-                                    <NavigationMenuLink
-                                        href={link.href}
-                                        className="py-1.5 font-medium text-muted-foreground hover:text-primary"
-                                    >
-                                        {link.label}
-                                    </NavigationMenuLink>
-                                )}
+                                <NavigationMenuLink
+                                    href={link.href}
+                                    className="py-1.5 font-medium text-muted-foreground hover:text-primary"
+                                >
+                                    {link.label}
+                                </NavigationMenuLink>
                             </NavigationMenuItem>
                         ))}
                     </NavigationMenuList>
@@ -272,11 +114,22 @@ export default function Navbar() {
 
                 {/* Right side */}
                 <div className="flex items-center gap-2">
-                    <Button asChild variant="ghost" size="sm" className="text-sm">
-                        <a href="#">Sign In</a>
-                    </Button>
-                    <Button asChild size="sm" className="text-sm">
-                        <a href="#">Get Started</a>
+                    {/* sign out button  */}
+                    <SignedOut>
+                        <Button variant="outline" size="sm" className="text-sm cursor-pointer">
+                            Sign In
+                        </Button>
+                    </SignedOut>
+
+                    {/* sign in button  */}
+                    <SignedIn>
+                        <Button variant="outline" size="sm" className="text-sm hover:scale-[1.1] transition-all duration-150 cursor-pointer">
+                            Logout
+                        </Button>
+                    </SignedIn>
+
+                    <Button size="sm" className="text-sm bg-linear-to-r from-[#ED0100] to-black hover:scale-[1.1] transition-all duration-150 cursor-pointer">
+                        Get Started
                     </Button>
                 </div>
             </div>
